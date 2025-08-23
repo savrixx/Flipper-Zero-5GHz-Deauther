@@ -2,7 +2,7 @@
 ![stats1](https://hackatime-badge.hackclub.com/U092FFBRR0Q/RTL8720dn-DeautherWithRTOS)
 
 # Flipper Zero 5GHz Deauther
-Flipper Zero 5GHz Deauther using the BW16 (RTL8720dn)
+Open Source Flipper Zero 5GHz Deauther using the BW16 (RTL8720dn)
 
 I made this project for the [Summer Hackclub](https://summer.hack.club/bc1)
 
@@ -40,8 +40,8 @@ Make sure to turn on 5V on GPIO on the Flipper Zero
 | Flipper Zero | BW16 |
 | ----------- | ----------- |
 | 5V | 5V |
-| TX | LOG_RX | 
-| RX | LOG_TX | 
+| TX | SERIAL1_RX | 
+| RX | SERIAL1_TX | 
 | GND | GND | 
 
 ---
