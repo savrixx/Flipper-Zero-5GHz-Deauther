@@ -159,6 +159,13 @@ static NetworkGroup* current_network_group = NULL;
 static bool g_attack_active = false;
 static bool g_beacon_attack_active = false;
 
+// Global reference to app for navigation callbacks
+static DeautherApp* g_app_instance = NULL;
+
+// Forward declarations
+static void deauther_update_attack_label(DeautherApp* app);
+static void deauther_update_beacon_attack_label(DeautherApp* app);
+
 /**
  * @brief      Callback for exiting the application.
  * @details    This function is called when user press back button.  We return VIEW_NONE to
@@ -180,6 +187,31 @@ static uint32_t deauther_navigation_exit_callback(void* _context) {
 */
 static uint32_t deauther_navigation_submenu_callback(void* _context) {
     UNUSED(_context);
+    
+    // Stop all attacks when returning to main menu
+    if(g_app_instance && (g_attack_active || g_beacon_attack_active)) {
+        if(g_attack_active) {
+            // Stop deauth attack
+            uart_helper_send(g_app_instance->uart_helper, "\x02", 1);
+            uart_helper_send(g_app_instance->uart_helper, "d", 1);
+            uart_helper_send(g_app_instance->uart_helper, "s", 1);
+            uart_helper_send(g_app_instance->uart_helper, "\x03", 1);
+            g_attack_active = false;
+            deauther_update_attack_label(g_app_instance);
+            FURI_LOG_I(TAG, "Deauth attack stopped on menu return");
+        }
+        if(g_beacon_attack_active) {
+            // Stop beacon attack
+            uart_helper_send(g_app_instance->uart_helper, "\x02", 1);
+            uart_helper_send(g_app_instance->uart_helper, "b", 1);
+            uart_helper_send(g_app_instance->uart_helper, "s", 1);
+            uart_helper_send(g_app_instance->uart_helper, "\x03", 1);
+            g_beacon_attack_active = false;
+            deauther_update_beacon_attack_label(g_app_instance);
+            FURI_LOG_I(TAG, "Beacon attack stopped on menu return");
+        }
+    }
+    
     return DeautherViewSubmenu;
 }
 
@@ -287,6 +319,8 @@ static void free_group(NetworkGroup* group) {
 */
 static void deauther_submenu_callback(void* context, uint32_t index) {
     DeautherApp* app = (DeautherApp*)context;
+    
+    
     switch(index) {
     case DeautherSubmenuIndexSetup:
         view_dispatcher_switch_to_view(app->view_dispatcher, DeautherViewSetup);
@@ -1108,6 +1142,9 @@ static void deauther_setting_portal_change(VariableItem* item) {
 static DeautherApp* deauther_app_alloc() {
     DeautherApp* app = (DeautherApp*)malloc(sizeof(DeautherApp));
 
+    // Set global reference for navigation callbacks
+    g_app_instance = app;
+
     Gui* gui = furi_record_open(RECORD_GUI);
 
     app->view_dispatcher = view_dispatcher_alloc();
@@ -1151,8 +1188,10 @@ static DeautherApp* deauther_app_alloc() {
 
     /////////////////// beacon screen
     app->beacon_submenu = submenu_alloc();
+    /*
     submenu_add_item(
         app->beacon_submenu, "Setup", DeautherSubmenuBeaconSetup, beacon_submenu_callback, app);
+    */
     submenu_add_item(
         app->beacon_submenu, "Mode", DeautherSubmenuBeaconModeMenu, beacon_submenu_callback, app);
     submenu_add_item(
@@ -1182,7 +1221,7 @@ static DeautherApp* deauther_app_alloc() {
 
 
 
-    // Beacon setup screen
+    // Beacon setup screen (not implemented yet)
     app->beacon_setup = variable_item_list_alloc();
     variable_item_list_reset(app->beacon_setup);
     
@@ -1194,6 +1233,7 @@ static DeautherApp* deauther_app_alloc() {
         app->view_dispatcher,
         DeautherViewBeaconSetup,
         variable_item_list_get_view(app->beacon_setup));
+
 
     // Scan screen
     app->widget_scan = widget_alloc();
@@ -1343,6 +1383,9 @@ static DeautherApp* deauther_app_alloc() {
  * @param      app  The skeleton application object.
 */
 static void deauther_app_free(DeautherApp* app) {
+    // Clear global reference
+    g_app_instance = NULL;
+
 #ifdef BACKLIGHT_ON
     if(app->notifications) notification_message(app->notifications, &sequence_display_backlight_enforce_auto);
 #endif

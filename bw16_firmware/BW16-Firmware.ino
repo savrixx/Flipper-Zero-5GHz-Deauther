@@ -617,12 +617,12 @@ int cmd_get(){
   #endif
 
   DEBUG_SER_PRINTLN("");
-  Serial.print(start + String('i') + scan_results.size() + end);
+  Serial1.print(start + String('i') + scan_results.size() + end);
   for (uint32_t i = 0; i < scan_results.size(); i++) {
     if (scan_results[i].ssid == ""){
-      Serial.print(start + String('n') + String(i) + sep + "Hidden" + sep + scan_results[i].bssid_str + sep + ((scan_results[i].channel >= 36) ? "1" : "0") + end);
+      Serial1.print(start + String('n') + String(i) + sep + "Hidden" + sep + scan_results[i].bssid_str + sep + ((scan_results[i].channel >= 36) ? "1" : "0") + end);
     } else{
-      Serial.print(start + String('n') + String(i) + sep + scan_results[i].ssid + sep + scan_results[i].bssid_str + sep + ((scan_results[i].channel >= 36) ? "1" : "0") + end);
+      Serial1.print(start + String('n') + String(i) + sep + scan_results[i].ssid + sep + scan_results[i].bssid_str + sep + ((scan_results[i].channel >= 36) ? "1" : "0") + end);
     }
   }
   DEBUG_SER_PRINTLN("");
@@ -761,8 +761,8 @@ void read_line(){
   byte rb;
   
 
-  while (Serial.available() > 0 && newData == false) {
-    rb = Serial.read();
+  while (Serial1.available() > 0 && newData == false) {
+    rb = Serial1.read();
 
     if (recvInProgress == true) {
         if (rb != endMarker) {
@@ -796,7 +796,7 @@ void read_line(){
       dataArray[n-1] = receivedBytes[n];
 
       DEBUG_SER_PRINT((char)receivedBytes[n]);
-      Serial.print(' ');
+      DEBUG_SER_PRINT(' ');
     }
 
     DEBUG_SER_PRINTLN();
@@ -942,11 +942,11 @@ void clientHandler(void *pvParameters){
                             DEBUG_SER_PRINT("Password: ");
                             DEBUG_SER_PRINTLN(password);
 
-                            Serial.print(start + "c" + sep);
-                            Serial.print(username);
-                            Serial.print(sep);
-                            Serial.print(password);
-                            Serial.println(end);
+                            Serial1.print(start + "c" + sep);
+                            Serial1.print(username);
+                            Serial1.print(sep);
+                            Serial1.print(password);
+                            Serial1.println(end);
                         }
                     }
                     String response = makeResponse(200, "text/plain");
@@ -1012,7 +1012,7 @@ void setup() {
   pinMode(LED_B, OUTPUT);
 
   Serial.begin(115200);
-  //Serial1.begin(115200);
+  Serial1.begin(115200);
   WiFi.status();
 
   if (scanInProcess == NULL) {
