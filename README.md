@@ -1,5 +1,6 @@
-![stats](https://hackatime-badge.hackclub.com/U092FFBRR0Q/flipperzero-bw16-deauther)
-![stats1](https://hackatime-badge.hackclub.com/U092FFBRR0Q/RTL8720dn-DeautherWithRTOS)
+| App | Firmware |
+| ----------- | ----------- |
+| ![stats](https://hackatime-badge.hackclub.com/U092FFBRR0Q/flipperzero-bw16-deauther) | ![stats1](https://hackatime-badge.hackclub.com/U092FFBRR0Q/RTL8720dn-DeautherWithRTOS) |
 
 # Flipper Zero 5GHz Deauther
 Open Source Flipper Zero 5GHz Deauther using the BW16 (RTL8720dn)
